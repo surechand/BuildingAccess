@@ -81,7 +81,7 @@ class Window(QMainWindow):
         
         super().__init__(parent)
         
-        self.setWindowTitle('PyQt6 Lab')
+        self.setWindowTitle('Bardzo poważna aplikacja')
         self.setFixedHeight(400)
         self.setFixedWidth(600)
         self.move(60, 15)
@@ -115,7 +115,7 @@ class Window(QMainWindow):
 
                 nameLabel = QLabel("name: "+i.door.doorName)
                 idLabel = QLabel("id: "+i.door.lockId)
-                openLabel = QLabel("name: true" if i.door.isOpen else "name: false")
+                openLabel = QLabel("isOpen: true" if i.door.isOpen else "isOpen: false")
             
                 layout.addWidget(nameLabel, 0, 0)
                 layout.addWidget(idLabel, 1, 0)
