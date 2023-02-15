@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>WebScockets 101</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link href="/server/src/public/styles.css" />
+  </head>
+
+  <body>
+    <h1>HELLO</h1>
+    <div id="chat">
+      <h2>Logowanie</h2>
+      <input id="login" type="text" placeholder="Login" />
+      <input id="password" type="text" placeholder="Password" />
+      <button id="send">Send</button>
+    </div>
+    <h1>Panel admina</h1>
+    <div id="newuser">
+      <h2>Dodawanie nowego użytkownika</h2>
+      <input id="email-new-user" type="text" placeholder="Email" />
+      <input id="password-new-user" type="password" placeholder="Password" />
+      <button id="add-user">Add new user</button>
+    </div>
+    <div id="deleteuser">
+      <h2>Usuwanie istniejącego użytkownika</h2>
+      <input id="email-old-user" type="text" placeholder="Email" />
+      <button id="delete-user">Delete user</button>
+    </div>
+    <div id="adddoors">
+      <h2>Dodawanie drzwi</h2>
+      <input id="lockID" type="text" placeholder="LockID" />
+      <input id="doorName" type="text" placeholder="Door name" />
+      <button id="add-doors">Add Doors</button>
+    </div>
+    <div id="deletedoors">
+      <h2>Usuwanie drzwi</h2>
+      <input id="lockID2" type="text" placeholder="LockID" />
+      <button id="delete-doors">Delete Doors</button>
+    </div>
+
+    <div id="addPermision">
+      <h2>Dodawanie uprawnien</h2>
+      <input id="lockID_perm" type="text" placeholder="LockID" />
+      <input id="email_perm" type="text" placeholder="Email" />
+      <button id="add-perm">Add Permission</button>
+    </div>
+    <div id="deltePermission">
+      <h2>Usuwanie uprawnien</h2>
+      <input id="lockID_perm2" type="text" placeholder="LockID" />
+      <input id="email_perm2" type="text" placeholder="Email" />
+      <button id="delete-perm">Delete Permission</button>
+    </div>
+    <div id="deltePermission">
+      <h2>Get doors for user</h2>
+      <input id="email_list" type="text" placeholder="Email" />
+      <button id="get-doors">Get doors</button>
+    </div>
+
+    <div id="deltePermission">
+      <h2>Open door</h2>
+      <input id="doorOpen" type="text" placeholder="Door ID" />
+      <button id="doorOpenButton">Open</button>
+    </div>
+
+    <div id="deltePermission">
+      <h2>Close door</h2>
+      <input id="doorClose" type="text" placeholder="Door ID" />
+      <button id="doorCloseButton">Close</button>
+    </div>
+
+    <div id="deltePermission">
+      <h2>Open door for 10 seconds</h2>
+      <input id="doorQuickOpen" type="text" placeholder="Door ID" />
+      <button id="doorQuickOpenButton">Open for 10 seconds</button>
+    </div>
+
+    <script>
+      var socket = io.connect("http://localhost:4000", {
+        transports: ["websocket"],
+        upgrade: false,
+      });
+
+      var login = document.getElementById("login");
+      var password = document.getElementById("password");
+
+      var button = document.getElementById("send");
+
+      var addUserButton = document.getElementById("add-user");
+
+      var deleteUserButton = document.getElementById("delete-user");
+
+      var addDoorsButton = document.getElementById("add-doors");
+      var deleteDoorsButton = document.getElementById("delete-doors");
+
+      var addPermissionButton = document.getElementById("add-perm");
+      var deletePermissionButton = document.getElementById("delete-perm");
+
+      var getUsersButton = document.getElementById("get-doors");
+
+      var doorOpenButton = document.getElementById("doorOpenButton");
+      var doorCloseButton = document.getElementById("doorCloseButton");
+      var doorQuickOpenButton = document.getElementById("doorQuickOpenButton");
+
+      getUsersButton.addEventListener("click", function (e) {
+        var emailInput = document.getElementById("email_list");
+        console.log("elo");
+        socket.emit("doorsList", { email: emailInput.value });
+        socket.on("doors", function (data) {
+          console.log(data);
+        });
+      });
+
+      addPermissionButton.addEventListener("click", function (e) {
+        var lockIDInput = document.getElementById("lockID_perm");
+        var emailInput = document.getElementById("email_perm");
+        if (lockIDInput.value && emailInput.value) {
+          socket.emit("addPermission", {
+            lockID: lockIDInput.value,
+            email: emailInput.value,
+          });
+          lockIDInput.value = "";
+          emailInput.value = "";
+        }
+      });
+
+      deletePermissionButton.addEventListener("click", function (e) {
+        var lockIDInput = document.getElementById("lockID_perm2");
+        var emailInput = document.getElementById("email_perm2");
+        if (lockIDInput.value && emailInput.value) {
+          socket.emit("deletePermission", {
+            lockID: lockIDInput.value,
+            email: emailInput.value,
+          });
+          lockIDInput.value = "";
+          emailInput.value = "";
+        }
+      });
+
+      addDoorsButton.addEventListener("click", function (e) {
+        var lockIDInput = document.getElementById("lockID");
+        var doorNameInput = document.getElementById("doorName");
+        if (lockIDInput.value && doorNameInput.value) {
+          socket.emit("addDoors", {
+            lockID: lockIDInput.value,
+            doorName: doorNameInput.value,
+          });
+          lockIDInput.value = "";
+          doorNameInput.value = "";
+        }
+      });
+
+      deleteDoorsButton.addEventListener("click", function (e) {
+        var lockIDInput = document.getElementById("lockID2");
+        if (lockIDInput.value) {
+          socket.emit("deleteDoors", { lockID: lockIDInput.value });
+          lockIDInput = "";
+        }
+      });
+
+      addUserButton.addEventListener("click", function (e) {
+        var email = document.getElementById("email-new-user");
+        var pass = document.getElementById("password-new-user");
+        if (email.value && pass.value) {
+          console.log("wysylanko");
+          socket.emit("addUser", { email: email.value, password: pass.value });
+          email.value = "";
+          pass.value = "";
+        }
+      });
+
+      deleteUserButton.addEventListener("click", function (e) {
+        var email = document.getElementById("email-old-user");
+        if (email.value) {
+          console.log("wysylanko");
+          socket.emit("deleteUser", { email: email.value });
+          email.value = "";
+        }
+      });
+
+      button.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (password.value) {
+          socket.emit("loginRequest", {
+            email: login.value,
+            password: password.value,
+          });
+          login.value = "";
+          password.value = "";
+          socket.on("deleteUserRes", function (data) {
+            alert(data);
+          });
+        }
+      });
+
+      doorOpenButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        var doorID = document.getElementById("doorOpen").value;
+        if (doorID) {
+          console.log("Opening door with id: " + doorID);
+          socket.emit("openDoor", { doorId: doorID });
+        }
+      });
+
+      doorCloseButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        var doorID = document.getElementById("doorClose").value;
+        if (doorID) {
+          console.log("Closing door with id: " + doorID);
+          socket.emit("closeDoor", { doorId: doorID });
+        }
+      });
+
+      doorQuickOpenButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        var doorID = document.getElementById("doorQuickOpen").value;
+        if (doorID) {
+          console.log("Opening door with id for 10 seconds: " + doorID);
+          socket.emit("quickOpenDoor", { doorId: doorID });
+        }
+      });
+    </script>
+  </body>
+</html>

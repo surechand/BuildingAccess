@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700");
+.loginBox {
+  min-height: 100vh;
+  padding: 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #222;
+  font-family: "Source Sans Pro", sans-serif;
+}
+
+.loginForm {
+  max-width: 500px;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  background-color: #111;
+  padding: 2em;
+  color: #ddd;
+}
+
+.inputtext {
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.3rem;
+  color: #fff;
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+  margin-top: 1em;
+}
+
+.inputtext:focus {
+  padding-bottom: 6px;
+  font-weight: 700;
+  border-width: 3px;
+  border-bottom: 2px solid #eeeeee;
+}
+
+.inputsubmit {
+  background: transparent;
+  color: #eee;
+  border: 2px solid #fff;
+  font-size: 12pt;
+  padding: 0.5em 1.5em;
+  outline: 0;
+  cursor: pointer;
+  box-sizing: inherit;
+  transition: all 0.5s;
+  margin: 2em;
+}
+.inputsubmit:hover {
+  background-color: #000;
+  border-color: #000;
+}
