@@ -227,7 +227,6 @@ io.on("connection", (socket) => {
         socket.emit("addDoorsRes", {
           lockID: data.lockID,
           doorName: data.doorName,
-          uuid: data.uuid,
           status: data.isOpen,
           error: false,
         });
@@ -237,7 +236,6 @@ io.on("connection", (socket) => {
         socket.emit("addDoorsRes", {
           lockID: data.lockID,
           doorName: data.doorName,
-          uuid: data.uuid,
           status: data.isOpen,
           error: true,
         });
@@ -393,28 +391,28 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("editUUID", (data) => {
-    console.log("editing uuid");
-    var editUUIDQuery =
-      'UPDATE doors SET uuid = "' +
-      data.newUUID +
-      '" WHERE lockID="' +
-      data.oldLockID +
-      '";';
-    connection.query(editUUIDQuery, function (err) {
-      if (err) {
-        console.log(
-          "Couldnt update door: " +
-            data.oldLockID +
-            " with new uuid: " +
-            data.newUUID
-        );
-        throw err;
-      } else {
-        console.log("Successfully updated door with uuid: " + data.newUUID);
-      }
-    });
-  });
+  // socket.on("editUUID", (data) => {
+  //   console.log("editing uuid");
+  //   var editUUIDQuery =
+  //     'UPDATE doors SET uuid = "' +
+  //     data.newUUID +
+  //     '" WHERE lockID="' +
+  //     data.oldLockID +
+  //     '";';
+  //   connection.query(editUUIDQuery, function (err) {
+  //     if (err) {
+  //       console.log(
+  //         "Couldnt update door: " +
+  //           data.oldLockID +
+  //           " with new uuid: " +
+  //           data.newUUID
+  //       );
+  //       throw err;
+  //     } else {
+  //       console.log("Successfully updated door with uuid: " + data.newUUID);
+  //     }
+  //   });
+  // });
 
   socket.on("editDoorName", (data) => {
     console.log("editing door name");
@@ -620,5 +618,22 @@ io.on("connection", (socket) => {
     }, 10000);
 
     // }
+  });
+
+  socket.on("dashboardRequest", (data) => {
+    var doorListQuery = "SELECT * from doors";
+
+    connection.query(doorListQuery, function (err, result, fields) {
+      if (err) {
+        throw err;
+      } else {
+        var doorsList = [];
+        for (const row of result) {
+          console.log(row.isOpen);
+          doorsList.push(new Door(row.lockID, row.door_name, row.isOpen));
+        }
+        socket.emit("dashboardRes", doorsList);
+      }
+    });
   });
 });
