@@ -9,6 +9,15 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
+// connection.query(
+//   `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'dupa123'`,
+//   function (err) {
+//     if (err) throw err;
+//     console.log("alter user root@localhost");
+//   }
+// );
+
+
 connection.query(
   "DROP DATABASE IF EXISTS `door_access_system`;",
   function (err) {
@@ -30,13 +39,6 @@ connection.query("USE door_access_system;", function (err) {
   console.log("Scheme door_access_system successfully created.");
 });
 
-// connection.query(
-//   `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'`,
-//   function (err) {
-//     if (err) throw err;
-//     console.log("alter user root@localhost");
-//   }
-// );
 
 //-----------------------------------------------------------------------------------------------------
 
