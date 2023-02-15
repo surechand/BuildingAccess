@@ -16,8 +16,12 @@ class Door:
         self.lockId = lockId
         self.doorName = doorName
         self.isOpen = isOpen
+class Tab:
+    def __init__(self, qWidget, door):
+        self.qWidget = qWidget
+        self.door = door
 doorList = []
-
+tabList = []
 
 
 class Client(QObject):
@@ -47,7 +51,8 @@ class Client(QObject):
     async def start(self):
         await self.sio.connect(url='http://localhost:4000')
         await self.sio.emit("dashboardRequest")
-        #await sio.wait()
+        await self.sio.wait()
+        await self.sio.disconnect()
 
     def _handle_connect(self):
         print('connection2222 established')
@@ -61,12 +66,14 @@ class Client(QObject):
     def client_unlock_ack(self, data):
         self.data_changed.emit(data)
 
-    async def res(data):
+    async def res(self,data):
         print(data)
         for element in data:
             print(element)
             doorList.append(Door(lockId=element['lockID'],doorName=element['doorName'],isOpen=element['isOpen']))      
         print('message received with ', data)
+        await self.sio.disconnect()
+        #self.disconnect.emit()
         #await sio.emit('my response', {'response': 'my response'})
     
 class Window(QMainWindow):
@@ -81,7 +88,7 @@ class Window(QMainWindow):
         self.create_menu()
         self.create_tabs()
         self.create_editor()
-        self.create_appender()
+        #self.create_appender()
 
     
     def create_menu(self):
@@ -95,15 +102,18 @@ class Window(QMainWindow):
         self.fileMenu.addAction(self.actionExit)
         
     def create_tabs(self):
+        print("test123")
         self.tabs = QTabWidget()
         
         self.tab_1 = QWidget()
         self.tab_2 = QWidget()
         self.tab_3 = QWidget()
+        
         if doorList:
             for i in doorList:
-                self.tabs.addTab(QWidget(), i.doorName)        
-            print("enpty")
+                tabList.append(Tab(qWidget=QWidget(),door=i))
+            for i in tabList:
+                self.tabs.addTab(i.qWidget, i.door.doorName)        
         self.setCentralWidget(self.tabs)
 
 
@@ -126,38 +136,18 @@ class Window(QMainWindow):
         outerLayout.addWidget(self.editor)
         outerLayout.addLayout(innerLayout)
         
-
     def create_appender(self):
-        layout = QGridLayout(self.tab_3)
+        if doorList:
+            for i in tabList:
+                layout = QGridLayout(i.qWidget)
 
-
-        self.textInput1 = QLineEdit()
-        textInput1Label = QLabel("Pole A")
-        self.textInput1.textChanged.connect(self.append)
-
-        self.textInput2 = QLineEdit()
-        textInput2Label = QLabel("Pole B")
-        self.textInput2.textChanged.connect(self.append)
-        
-        self.numericInput = QSpinBox()
-        self.numericInput.setRange(0, 9999)
-        numericInputLabel = QLabel("Pole C")
-        self.numericInput.clear()
-        self.numericInput.textChanged.connect(self.append)
-
-        self.resultField = QLineEdit()
-        self.resultField.setEnabled(False)
-        resultFieldLabel = QLabel("Pole A+B+C")
-
-        layout.addWidget(textInput1Label, 0, 0)
-        layout.addWidget(self.textInput1, 0, 1)
-        layout.addWidget(textInput2Label, 1, 0)
-        layout.addWidget(self.textInput2, 1, 1)
-        layout.addWidget(numericInputLabel, 2, 0)
-        layout.addWidget(self.numericInput, 2, 1)
-        layout.addWidget(resultFieldLabel, 3, 0)
-        layout.addWidget(self.resultField, 3, 1)
-
+                textInput1Label = QLabel("name: "+i.door.doorName)
+                textInput2Label = QLabel("id: "+i.door.lockId)
+                numericInputLabel = QLabel("name: true" if i.door.isOpen else "name: false")
+            
+                layout.addWidget(textInput1Label, 0, 0)
+                layout.addWidget(textInput2Label, 1, 0)
+                layout.addWidget(numericInputLabel, 2, 0)
 
     def openImage(self):
         fileName, selectedFilter = QFileDialog.getOpenFileName(self.tab_1, "Wybierz plik obrazu",  "", "PNG (*.png)")
@@ -208,20 +198,24 @@ class Window(QMainWindow):
         self.numericInput.v
         self.resultField.clear()
 
-        
     def append(self):
         self.resultField.setText(self.textInput1.text() + self.textInput2.text() + str(self.numericInput.value() ))
         
 
 app = QApplication([])
-loop = QEventLoop(app)
+loop = asyncio.get_event_loop()
 asyncio.set_event_loop(loop)
 win = Window()
 win.show()
-#asyncio.run(start())
 client = Client()
-client.data_changed.connect(win.update_data)
-with loop:
-        asyncio.ensure_future(client.start(), loop=loop)
-        loop.run_forever()
+asyncio.run(client.start())
+win.create_tabs()
+win.create_appender()
+# win2 = Window()
+# win2.show()
+#loop = asyncio.get_event_loop()
+#/asyncio.run(amain(loop=loop))
+#with loop:
+ #       asyncio.ensure_future(client.start(), loop=loop)
+#       loop.run_forever()
 app.exec()
