@@ -1,17 +1,24 @@
-## Inicjalizacja serwera
+## Serwer Node.js dla projektu
 
-Zainstalujcie sobie wcześniej serwer MySQL(https://dev.mysql.com/downloads/installer/)
- - wystarczy tylko mysql server, jak chcecie podgląd do bazy to możecie też pobrać workbencha
- - hasło do roota ustawcie na root
- - port 3306
+Technologie:
 
+- Node 18.12
+- Socket.io v4
+- Yarn classic v1.22.19
+- MySQL 8.0
 
-1. Wpisz `yarn` do terminala w folderze serwer.
-2. Wpisz `yarn initdb` do terminala w folderze serwer - inicjalizacja bazy danych.
-3. Wpisz `yarn start` do terminala w folderze serwer - uruchomienie serwera i wypisanie w konsoli mockowych danych z bazy.
+Instrukcja uruchomienia:
 
+- przejście do folderu projektu "cd server"
+- w konsoli:
+  1. `yarn` - aktualizacja paczek projektu
+  2. `yarn initdb` - inicjalizacja bazy danych
+  3. `yarn start` - uruchomienie serwera
 
-Jak wywali wam -> Error: ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol requested by server; consider upgrading MySQL client
+W przypadku błędu: "Error: ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol requested by server; consider upgrading MySQL client"
 
-to zróbcie query `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'`
+należy w MySQL Command Line Client wpisać query `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'`
+a następnie `flush privileges`.
 (https://stackoverflow.com/questions/50093144/mysql-8-0-client-does-not-support-authentication-protocol-requested-by-server)
+
+Dostęp do danych poprzez http://localhost:4000
